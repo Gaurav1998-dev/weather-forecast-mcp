@@ -23,7 +23,7 @@ const handler = createMcpHandler(
   async (server) => {
     server.tool(
       "get_weather_forecast",
-      "Get hourly temperature forecast for a given location using longitude and latitude coordinates",
+      "Get hourly temperature forecast for a given location using longitude and latitude coordinates!",
       {
         latitude: z
           .number()
