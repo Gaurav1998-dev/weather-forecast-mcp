@@ -16,6 +16,7 @@ interface WeatherResponse {
   hourly: {
     time: string[];
     temperature_2m: number[];
+    weather_code: number[];
   };
 }
 
@@ -23,7 +24,7 @@ const handler = createMcpHandler(
   async (server) => {
     server.tool(
       "get_weather_forecast",
-      "Get hourly temperature forecast for a given location using longitude and latitude coordinates!",
+      "Get hourly temperature forecast for a given location using longitude and latitude coordinates",
       {
         latitude: z
           .number()
@@ -41,7 +42,7 @@ const handler = createMcpHandler(
           console.log("latitude", latitude);
           console.log("longitude", longitude);
 
-          const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m`;
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weather_code&temperature_unit=fahrenheit`;
           const response = await fetch(url);
 
           console.log("response", response);
@@ -76,6 +77,10 @@ const handler = createMcpHandler(
                 weatherData.hourly.temperature_2m[
                   Math.max(0, currentHourIndex) + index
                 ],
+              weatherCode:
+                weatherData.hourly.weather_code[
+                  Math.max(0, currentHourIndex) + index
+                ],
               unit: weatherData.hourly_units.temperature_2m,
             }));
 
@@ -85,7 +90,7 @@ const handler = createMcpHandler(
             `Weather Forecast for coordinates (${latitude}, ${longitude}):\n\n` +
             `Next ${forecast.length} Hours Temperature Forecast:\n` +
             forecast
-              .map((f) => `- ${f.time}: ${f.temperature}${f.unit}`)
+              .map((f) => `- ${f.time}: ${f.temperature}${f.unit} (weatherCode: ${f.weatherCode})`)
               .join("\n");
 
           console.log("text", text);
